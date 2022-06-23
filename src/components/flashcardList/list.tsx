@@ -41,8 +41,8 @@ const LaunchList: React.FC<Props> = ({ data, handleIdChange }) => (
         Enjoy using this flashcard application
       </Typography>
       <Box sx ={{ display:"flex", alignContent:"right"}}>
-      <Link to="/signup">Sign Up</Link>
-      <Link to="/signin">Sign in</Link>
+  
+      <Link to="/signin">Sign in / register</Link>
       </Box>
      
       </Box>
