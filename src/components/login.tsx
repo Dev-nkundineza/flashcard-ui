@@ -11,11 +11,7 @@ import { useNavigate } from 'react-router-dom';
 import { LOGIN_MUTATION, SIGNUP_MUTATION }from './query';
 import { AUTH_TOKEN } from '../constants';
 import { useMutation } from "@apollo/client";
-import { Console } from "console";
 
-
-  
-  
   const useStyles = makeStyles((theme) => ({
    
     heading: {
@@ -62,7 +58,11 @@ import { Console } from "console";
       },
       onCompleted: ({ signup }) => {
         localStorage.setItem(AUTH_TOKEN, signup.token);
-        navigate('/');
+        setFormState({
+          ...formState,
+          login: false
+        });
+        // navigate('/');
       }
     });
 

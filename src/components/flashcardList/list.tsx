@@ -18,7 +18,7 @@ const LaunchList: React.FC<Props> = ({ data, handleIdChange }) => (
   <div className='container'>
   <div className={className}>
     <h3>Flash Cards</h3>
-    <ol className={`${className}__list`}>
+    {/* <ol className={`${className}__list`}> */}
       {!!data.flashcards.flashcards &&
         data.flashcards.flashcards.map(
           (flashcard, i) =>
@@ -32,7 +32,7 @@ const LaunchList: React.FC<Props> = ({ data, handleIdChange }) => (
               </li>
             ),
         )}
-    </ol>
+    {/* </ol> */}
   </div>
   <div className='rightSide'>
     <Container>
@@ -52,5 +52,5 @@ const LaunchList: React.FC<Props> = ({ data, handleIdChange }) => (
   </div>
   </div>
 );
-
+  
 export default LaunchList;
