@@ -19,3 +19,22 @@
     border-top: 1px solid #919191;
     cursor: pointer;
   }
+
+  .container {
+    display: flex;
+    justify-content: space-around;
+    flex-direction: row;
+    width: 100vw;
+  }
+
+  .rightSide {
+    /* align-items: center; */
+    background-color: aqua;
+    font-size: 18px;
+    height: 20vh;
+    margin-top: 10%;
+    
+  }
+  .box {
+    background-color: "blue";
+  }

@@ -1,4 +1,6 @@
+import { Box, Container, Typography } from '@material-ui/core';
 import * as React from 'react';
+import { Link } from 'react-router-dom';
 import { FlashcardsQuery } from '../../generated/graphql';
 import './styles.css';
 
@@ -13,6 +15,7 @@ interface Props extends OwnProps {
 const className = 'LaunchList';
 
 const LaunchList: React.FC<Props> = ({ data, handleIdChange }) => (
+  <div className='container'>
   <div className={className}>
     <h3>Flash Cards</h3>
     <ol className={`${className}__list`}>
@@ -30,6 +33,23 @@ const LaunchList: React.FC<Props> = ({ data, handleIdChange }) => (
             ),
         )}
     </ol>
+  </div>
+  <div className='rightSide'>
+    <Container>
+      <Box sx ={{ display: "flex" , flexDirection: "column", justifyContent: "spaceBetween"}}>
+      <Typography>
+        Enjoy using this flashcard application
+      </Typography>
+      <Box sx ={{ display:"flex", alignContent:"right"}}>
+      <Link to="/signup">Sign Up</Link>
+      <Link to="/signin">Sign in</Link>
+      </Box>
+     
+      </Box>
+     
+    </Container>
+
+  </div>
   </div>
 );
 
