@@ -1,7 +1,7 @@
 import { Box, Container, Typography } from '@material-ui/core';
 import * as React from 'react';
 import { Link } from 'react-router-dom';
-import { FlashcardsQuery } from '../../generated/graphql';
+import { QueryQuery } from '../../generated/graphql';
 import styled from '@emotion/styled';
 import { colors, mq } from './styles';
 import './styles.css';
@@ -10,13 +10,15 @@ import Paper from '@mui/material/Paper';
 import Divider from '@mui/material/Divider';
 import IconButton from '@mui/material/IconButton';
 import SearchIcon from '@mui/icons-material/Search';
+import DoneAllIcon from '@mui/icons-material/DoneAll';
+import HighlightOffIcon from '@mui/icons-material/HighlightOff';
 
 export interface OwnProps {
   handleIdChange: (newId: number) => void;
 }
 
 interface Props extends OwnProps {
-  data: FlashcardsQuery;
+  data: QueryQuery;
 }
 
 const className = 'LaunchList';
@@ -37,10 +39,10 @@ const LaunchList: React.FC<Props> = ({ data, handleIdChange }) => (
                     
                       <CardTitle> {flashcard.answer}</CardTitle>
                       <AuthorAndTrack>
-                        <AuthorName>{flashcard.answer}</AuthorName>
-                        <TrackLength>
-                          "edit"
-                        </TrackLength>
+                        <AuthorName>Posted By:  {flashcard.answer}</AuthorName>
+                        <AuthorName>
+                          {flashcard.isDone ? <DoneAllIcon sx={{ color: "green"}}/> : <HighlightOffIcon sx={{ color: "red"}}/>}
+                        </AuthorName>
                       </AuthorAndTrack>
                     
                   </CardBody>

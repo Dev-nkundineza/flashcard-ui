@@ -1,12 +1,16 @@
 import { gql } from '@apollo/client';
 
 export const QUERY_LAUNCH_LIST = gql`
-query Flashcards {
+query Query {
   flashcards {
     flashcards {
+      id
       question
       answer
-      id
+      isDone
+      postedBy {
+        name
+      }
     }
   }
 }

@@ -1,9 +1,9 @@
 import * as React from 'react';
-import { useFlashcardsQuery } from '../generated/graphql';
+import { useQueryQuery } from '../generated/graphql';
 import LaunchList, { OwnProps } from './flashcardList/flashCardsDashboard';
 
 const LaunchListContainer: React.FC<OwnProps> = (props) => {
-  const { data, error, loading } = useFlashcardsQuery ();
+  const { data, error, loading } = useQueryQuery ();
 
   if (loading) {
     return <div>Loading...</div>;

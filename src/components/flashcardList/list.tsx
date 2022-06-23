@@ -1,7 +1,9 @@
 import { Box, Container, Typography } from '@material-ui/core';
 import * as React from 'react';
 import { Link } from 'react-router-dom';
-import { FlashcardsQuery } from '../../generated/graphql';
+import { QueryQuery } from '../../generated/graphql';
+import DoneAllIcon from '@mui/icons-material/DoneAll';
+import RemoveDoneIcon from '@mui/icons-material/RemoveDone';
 import './styles.css';
 
 export interface OwnProps {
@@ -9,7 +11,7 @@ export interface OwnProps {
 }
 
 interface Props extends OwnProps {
-  data: FlashcardsQuery;
+  data: QueryQuery;
 }
 
 const className = 'LaunchList';

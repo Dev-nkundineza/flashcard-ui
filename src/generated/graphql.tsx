@@ -110,10 +110,10 @@ export type User = {
   name: Scalars['String'];
 };
 
-export type FlashcardsQueryVariables = Exact<{ [key: string]: never; }>;
+export type QueryQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type FlashcardsQuery = { __typename?: 'Query', flashcards: { __typename?: 'AllFlashcards', flashcards: Array<{ __typename?: 'Flashcard', question: string, answer: string, id: number }> } };
+export type QueryQuery = { __typename?: 'Query', flashcards: { __typename?: 'AllFlashcards', flashcards: Array<{ __typename?: 'Flashcard', id: number, question: string, answer: string, isDone: boolean, postedBy?: { __typename?: 'User', name: string } | null }> } };
 
 export type MutationMutationVariables = Exact<{
   email: Scalars['String'];
@@ -133,44 +133,48 @@ export type LoginMutationMutationVariables = Exact<{
 export type LoginMutationMutation = { __typename?: 'Mutation', login: { __typename?: 'AuthPayload', token: string } };
 
 
-export const FlashcardsDocument = gql`
-    query Flashcards {
+export const QueryDocument = gql`
+    query Query {
   flashcards {
     flashcards {
+      id
       question
       answer
-      id
+      isDone
+      postedBy {
+        name
+      }
     }
   }
 }
     `;
 
 /**
- * __useFlashcardsQuery__
+ * __useQueryQuery__
  *
- * To run a query within a React component, call `useFlashcardsQuery` and pass it any options that fit your needs.
- * When your component renders, `useFlashcardsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * To run a query within a React component, call `useQueryQuery` and pass it any options that fit your needs.
+ * When your component renders, `useQueryQuery` returns an object from Apollo Client that contains loading, error, and data properties
  * you can use to render your UI.
  *
  * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
  *
  * @example
- * const { data, loading, error } = useFlashcardsQuery({
+ * const { data, loading, error } = useQueryQuery({
  *   variables: {
  *   },
  * });
  */
-export function useFlashcardsQuery(baseOptions?: Apollo.QueryHookOptions<FlashcardsQuery, FlashcardsQueryVariables>) {
+export function useQueryQuery(baseOptions?: Apollo.QueryHookOptions<QueryQuery, QueryQueryVariables>) {
         const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<FlashcardsQuery, FlashcardsQueryVariables>(FlashcardsDocument, options);
+        return Apollo.useQuery<QueryQuery, QueryQueryVariables>(QueryDocument, options);
       }
-export function useFlashcardsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<FlashcardsQuery, FlashcardsQueryVariables>) {
+export function useQueryLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<QueryQuery, QueryQueryVariables>) {
           const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<FlashcardsQuery, FlashcardsQueryVariables>(FlashcardsDocument, options);
+          return Apollo.useLazyQuery<QueryQuery, QueryQueryVariables>(QueryDocument, options);
         }
-export type FlashcardsQueryHookResult = ReturnType<typeof useFlashcardsQuery>;
-export type FlashcardsLazyQueryHookResult = ReturnType<typeof useFlashcardsLazyQuery>;
-export type FlashcardsQueryResult = Apollo.QueryResult<FlashcardsQuery, FlashcardsQueryVariables>;
+export type QueryQueryHookResult = ReturnType<typeof useQueryQuery>;
+export type QueryLazyQueryHookResult = ReturnType<typeof useQueryLazyQuery>;
+export type QueryQueryResult = Apollo.QueryResult<QueryQuery, QueryQueryVariables>;
 export const MutationDocument = gql`
     mutation Mutation($email: String!, $password: String!, $name: String!) {
   signup(email: $email, password: $password, name: $name) {
