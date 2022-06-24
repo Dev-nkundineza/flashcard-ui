@@ -16,6 +16,8 @@ import HighlightOffIcon from '@mui/icons-material/HighlightOff';
 import AddCircleTwoToneIcon from '@mui/icons-material/AddCircleTwoTone';
 import Input from '@mui/material/Input';
 import Button from '@mui/material/Button';
+import ModeEditTwoToneIcon from '@mui/icons-material/ModeEditTwoTone';
+import DeleteTwoToneIcon from '@mui/icons-material/DeleteTwoTone';
 
 export interface OwnProps {
   handleIdChange: (newId: number) => void;
@@ -79,13 +81,20 @@ const Dashboard: React.FC<Props> = ({ handleIdChange }) => {
                         <CardTitle> {flashcard.answer}</CardTitle>
                         <AuthorAndTrack>
                           <AuthorName>Posted By: {flashcard.answer}</AuthorName>
-                          <AuthorName>
+                          <Icons>
                             {flashcard.isDone ? (
                               <DoneAllIcon sx={{ color: 'green' }} />
                             ) : (
                               <HighlightOffIcon sx={{ color: 'red' }} />
                             )}
-                          </AuthorName>
+                            
+                            <ModeEditTwoToneIcon sx={{ marginLeft: '10px'}}/> <Typography> Edit</Typography> 
+                            
+                            
+                            <DeleteTwoToneIcon sx={{ marginLeft: '10px'}}/> <Typography>  Delete</Typography> 
+                            
+                          </Icons>
+                          
                         </AuthorAndTrack>
                       </CardBody>
                     </CardContent>
@@ -229,3 +238,10 @@ const AuthorName = styled.div({
   lineHeight: '1em',
   fontSize: '1.1em',
 });
+
+const Icons = styled.div({
+    lineHeight: '1em',
+    fontSize: '1.1em',
+    display: 'flex',
+    justifyContent: 'right',
+  });
