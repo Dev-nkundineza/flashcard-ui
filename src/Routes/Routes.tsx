@@ -19,7 +19,13 @@ const AllRoutes: React.FC = ()=>{
     <Routes>
     <Route path="/" element={<Home handleIdChange={handleIdChange}/>}/>
     <Route path="/signin" element={<LoginComponent/>}/>
-    <Route path="/dashboard" element={<Dashboard/>}/>
+    <Route path="/dashboard" element={<Dashboard handleIdChange={handleIdChange} data={{
+          __typename: undefined,
+          flashcards: {
+            __typename: undefined,
+            flashcards: []
+          }
+        }}/>}/>
     </Routes>
 )};
    

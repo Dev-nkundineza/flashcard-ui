@@ -46,7 +46,7 @@ import { useMutation } from "@apollo/client";
       },
       onCompleted: ({ login }) => {
         localStorage.setItem(AUTH_TOKEN, login.token);
-        navigate('/');
+        navigate('/dashboard');
       }
     });
 
@@ -56,13 +56,16 @@ import { useMutation } from "@apollo/client";
         email: formState.email,
         password: formState.password
       },
+      onError: (err)=>{
+         console.dir(err)
+      },
       onCompleted: ({ signup }) => {
         localStorage.setItem(AUTH_TOKEN, signup.token);
         setFormState({
           ...formState,
           login: false
         });
-        // navigate('/');
+        navigate('/signin');
       }
     });
 
@@ -77,7 +80,9 @@ import { useMutation } from "@apollo/client";
 
     function handleSubmit(event: React.FormEvent<UsernameFormElement>) {
       event.preventDefault()
-      formState.login ? login() :
+      formState.login ? login().then((data)=>{
+        console.log(data)
+      }).catch(e=> console.log(e)) :
       signup();
     }
 

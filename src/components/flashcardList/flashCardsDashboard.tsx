@@ -136,27 +136,6 @@ const CardContainer = styled.div({
     flex: 1,
   });
   
-  const CardImageContainer = styled.div({
-    height: 220,
-    position: 'relative',
-    '::after': {
-      content: '""',
-      position: 'absolute',
-      top: 0,
-      bottom: 0,
-      left: 0,
-      right: 0,
-      background: 'rgba(250,0,150,0.20)',
-    },
-  });
-  
-  const CardImage = styled.img({
-    objectFit: 'cover',
-    width: '100%',
-    height: '100%',
-    filter: 'grayscale(60%)',
-  });
-  
   const CardBody = styled.div({
     padding: 18,
     flex: 1,
@@ -166,13 +145,6 @@ const CardContainer = styled.div({
     justifyContent: 'space-around',
   });
   
-  const AuthorImage = styled.img({
-    height: 30,
-    width: 30,
-    marginRight: 8,
-    borderRadius: '50%',
-    objectFit: 'cover',
-  });
   
   const AuthorAndTrack = styled.div({
     display: 'flex',
@@ -185,7 +157,4 @@ const CardContainer = styled.div({
     fontSize: '1.1em',
   });
   
-  const TrackLength = styled.div({
-    fontSize: '0.8em',
-  });
   
