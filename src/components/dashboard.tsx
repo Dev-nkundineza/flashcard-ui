@@ -18,6 +18,9 @@ import Input from '@mui/material/Input';
 import Button from '@mui/material/Button';
 import ModeEditTwoToneIcon from '@mui/icons-material/ModeEditTwoTone';
 import DeleteTwoToneIcon from '@mui/icons-material/DeleteTwoTone';
+import { CREATE_FLASHCARD, DELETE_MUTATION  } from './query';
+import { AUTH_TOKEN } from '../constants';
+import { useMutation } from '@apollo/client';
 
 export interface OwnProps {
   handleIdChange: (newId: number) => void;
@@ -30,12 +33,63 @@ interface Props extends OwnProps {
 const className = 'LaunchList';
 const ariaLabel = { 'aria-label': 'description' };
 
+
 const Dashboard: React.FC<Props> = ({ handleIdChange }) => {
   // state management
 
   const [formState, setFormState] = React.useState({
+    login: true,
+    question: '',
+    answer: '',
     display: false,
+    id: 0,
   });
+
+
+  const [createFlashcard] = useMutation(CREATE_FLASHCARD, {
+      variables: {
+        question: formState.question,
+        answer: formState.answer,
+      },
+      onError: (err)=>{
+         console.dir(err)
+      },
+      onCompleted: ({ createFlashcard }) => {
+        setFormState({
+          ...formState,
+          login: false
+        });
+      }
+    });
+
+    
+       const [deleteFlashcard]=  useMutation(DELETE_MUTATION, {
+        variables: {
+          deleteFlashcardId: 0,
+          
+        },
+        onError: (err)=>{
+           console.dir(err)
+        },
+        onCompleted: ({ deleteFlashcard }) => {
+          setFormState({
+            ...formState,
+            login: false
+          });
+        }
+      });
+
+    interface FormElements extends HTMLFormControlsCollection {
+      usernameInput: HTMLInputElement
+    }
+    interface UsernameFormElement extends HTMLFormElement {
+      readonly elements: FormElements
+    }
+
+    function handleSubmit(event: React.FormEvent<UsernameFormElement>) {
+      event.preventDefault()
+      createFlashcard();
+    }
 
   const { data, error, loading } = useQueryQuery();
 
@@ -91,7 +145,12 @@ const Dashboard: React.FC<Props> = ({ handleIdChange }) => {
                             <ModeEditTwoToneIcon sx={{ marginLeft: '10px'}}/> <Typography> Edit</Typography> 
                             
                             
-                            <DeleteTwoToneIcon sx={{ marginLeft: '10px'}}/> <Typography>  Delete</Typography> 
+                            <DeleteTwoToneIcon sx={{ marginLeft: '10px'}}/> <Typography onClick={()=>deleteFlashcard({
+                               variables: {
+                                deleteFlashcardId: flashcard.id,                               
+                              },
+                            }) }
+                            >  Delete</Typography> 
                             
                           </Icons>
                           
@@ -134,7 +193,8 @@ const Dashboard: React.FC<Props> = ({ handleIdChange }) => {
           >
             <Typography>Enjoy using this flashcard application</Typography>
             <Box sx={{ display: 'flex', alignContent: 'right' }}>
-              <Link to="/signin">Sign out</Link>
+              <Link to="/signin" onClick={()=> {
+                localStorage.removeItem("auth-token")}}>Sign out</Link>
             </Box>
           </Box>
 
@@ -148,15 +208,32 @@ const Dashboard: React.FC<Props> = ({ handleIdChange }) => {
               padding: '40px',
               borderRadius: '10px',
             }}
+            onSubmit={ handleSubmit }
           >
-            <Input placeholder="question" inputProps={ariaLabel} />
             <Input
+             value= { formState.question} 
+             placeholder="question"
+             inputProps={ariaLabel} 
+             onChange={(e) =>
+              setFormState({
+                ...formState,
+                question: e.target.value
+              })}
+            />
+            <Input
+              value = {formState.answer}
               placeholder="answer"
               inputProps={ariaLabel}
               sx={{ marginTop: '40px' }}
+              onChange={(e) =>
+                setFormState({
+                  ...formState,
+                  answer: e.target.value
+                })}
             />
             <Button
               variant="contained"
+              type='submit'
               sx={{ marginTop: '40px', backgroundColor: '#4169e1' }}
             >
               Add Flashcard

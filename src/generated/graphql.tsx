@@ -132,6 +132,21 @@ export type LoginMutationMutationVariables = Exact<{
 
 export type LoginMutationMutation = { __typename?: 'Mutation', login: { __typename?: 'AuthPayload', token: string } };
 
+export type CreateMutationVariables = Exact<{
+  question: Scalars['String'];
+  answer: Scalars['String'];
+}>;
+
+
+export type CreateMutation = { __typename?: 'Mutation', createFlashcard: { __typename?: 'Flashcard', question: string, answer: string } };
+
+export type Delete_FlashcardMutationVariables = Exact<{
+  deleteFlashcardId: Scalars['Int'];
+}>;
+
+
+export type Delete_FlashcardMutation = { __typename?: 'Mutation', deleteFlashcard: { __typename?: 'Flashcard', question: string, answer: string } };
+
 
 export const QueryDocument = gql`
     query Query {
@@ -244,3 +259,72 @@ export function useLoginMutationMutation(baseOptions?: Apollo.MutationHookOption
 export type LoginMutationMutationHookResult = ReturnType<typeof useLoginMutationMutation>;
 export type LoginMutationMutationResult = Apollo.MutationResult<LoginMutationMutation>;
 export type LoginMutationMutationOptions = Apollo.BaseMutationOptions<LoginMutationMutation, LoginMutationMutationVariables>;
+export const CreateDocument = gql`
+    mutation create($question: String!, $answer: String!) {
+  createFlashcard(question: $question, answer: $answer) {
+    question
+    answer
+  }
+}
+    `;
+export type CreateMutationFn = Apollo.MutationFunction<CreateMutation, CreateMutationVariables>;
+
+/**
+ * __useCreateMutation__
+ *
+ * To run a mutation, you first call `useCreateMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createMutation, { data, loading, error }] = useCreateMutation({
+ *   variables: {
+ *      question: // value for 'question'
+ *      answer: // value for 'answer'
+ *   },
+ * });
+ */
+export function useCreateMutation(baseOptions?: Apollo.MutationHookOptions<CreateMutation, CreateMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CreateMutation, CreateMutationVariables>(CreateDocument, options);
+      }
+export type CreateMutationHookResult = ReturnType<typeof useCreateMutation>;
+export type CreateMutationResult = Apollo.MutationResult<CreateMutation>;
+export type CreateMutationOptions = Apollo.BaseMutationOptions<CreateMutation, CreateMutationVariables>;
+export const Delete_FlashcardDocument = gql`
+    mutation Delete_Flashcard($deleteFlashcardId: Int!) {
+  deleteFlashcard(id: $deleteFlashcardId) {
+    question
+    answer
+  }
+}
+    `;
+export type Delete_FlashcardMutationFn = Apollo.MutationFunction<Delete_FlashcardMutation, Delete_FlashcardMutationVariables>;
+
+/**
+ * __useDelete_FlashcardMutation__
+ *
+ * To run a mutation, you first call `useDelete_FlashcardMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useDelete_FlashcardMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [deleteFlashcardMutation, { data, loading, error }] = useDelete_FlashcardMutation({
+ *   variables: {
+ *      deleteFlashcardId: // value for 'deleteFlashcardId'
+ *   },
+ * });
+ */
+export function useDelete_FlashcardMutation(baseOptions?: Apollo.MutationHookOptions<Delete_FlashcardMutation, Delete_FlashcardMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<Delete_FlashcardMutation, Delete_FlashcardMutationVariables>(Delete_FlashcardDocument, options);
+      }
+export type Delete_FlashcardMutationHookResult = ReturnType<typeof useDelete_FlashcardMutation>;
+export type Delete_FlashcardMutationResult = Apollo.MutationResult<Delete_FlashcardMutation>;
+export type Delete_FlashcardMutationOptions = Apollo.BaseMutationOptions<Delete_FlashcardMutation, Delete_FlashcardMutationVariables>;

@@ -32,3 +32,22 @@ mutation LoginMutation($email: String!, $password: String!) {
   }
 }
 `;
+
+export const CREATE_FLASHCARD = gql`
+mutation create($question: String!, $answer: String!) {
+  createFlashcard(question: $question, answer: $answer) {
+    question
+    answer
+  }
+}
+
+`;
+
+export const DELETE_MUTATION = gql`
+mutation Delete_Flashcard($deleteFlashcardId: Int!) {
+  deleteFlashcard(id: $deleteFlashcardId) {
+    question
+    answer
+  }
+}
+`;

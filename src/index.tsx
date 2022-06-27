@@ -1,12 +1,31 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { ApolloClient, ApolloProvider, InMemoryCache } from '@apollo/client';
+import { ApolloClient, ApolloProvider, createHttpLink, InMemoryCache } from '@apollo/client';
 import CssBaseline from "@material-ui/core/CssBaseline";
 import './index.css';
 import App from './App';
+import { setContext } from '@apollo/client/link/context';
+
+
+const httpLink = createHttpLink({
+  uri: 'https://flashcardbackend-api.herokuapp.com/',
+});
+
+const authLink = setContext((_, { headers }) => {
+  // get the authentication token from local storage if it exists
+  const token = localStorage.getItem('auth-token');
+  // return the headers to the context so httpLink can read them
+  return {
+    headers: {
+      ...headers,
+      authorization: token ? `Bearer ${token}` : "",
+    }
+  }
+});
+
 
 const client = new ApolloClient({
-  uri: 'https://flashcardbackend-api.herokuapp.com/',
+  link: authLink.concat(httpLink), 
   cache: new InMemoryCache(),
 });
 
