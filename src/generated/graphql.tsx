@@ -147,6 +147,13 @@ export type Delete_FlashcardMutationVariables = Exact<{
 
 export type Delete_FlashcardMutation = { __typename?: 'Mutation', deleteFlashcard: { __typename?: 'Flashcard', question: string, answer: string } };
 
+export type FlashcardsQueryVariables = Exact<{
+  filter?: InputMaybe<Scalars['String']>;
+}>;
+
+
+export type FlashcardsQuery = { __typename?: 'Query', flashcards: { __typename?: 'AllFlashcards', flashcards: Array<{ __typename?: 'Flashcard', id: number, answer: string, question: string, isDone: boolean }> } };
+
 
 export const QueryDocument = gql`
     query Query {
@@ -328,3 +335,43 @@ export function useDelete_FlashcardMutation(baseOptions?: Apollo.MutationHookOpt
 export type Delete_FlashcardMutationHookResult = ReturnType<typeof useDelete_FlashcardMutation>;
 export type Delete_FlashcardMutationResult = Apollo.MutationResult<Delete_FlashcardMutation>;
 export type Delete_FlashcardMutationOptions = Apollo.BaseMutationOptions<Delete_FlashcardMutation, Delete_FlashcardMutationVariables>;
+export const FlashcardsDocument = gql`
+    query Flashcards($filter: String) {
+  flashcards(filter: $filter) {
+    flashcards {
+      id
+      answer
+      question
+      isDone
+    }
+  }
+}
+    `;
+
+/**
+ * __useFlashcardsQuery__
+ *
+ * To run a query within a React component, call `useFlashcardsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useFlashcardsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useFlashcardsQuery({
+ *   variables: {
+ *      filter: // value for 'filter'
+ *   },
+ * });
+ */
+export function useFlashcardsQuery(baseOptions?: Apollo.QueryHookOptions<FlashcardsQuery, FlashcardsQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<FlashcardsQuery, FlashcardsQueryVariables>(FlashcardsDocument, options);
+      }
+export function useFlashcardsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<FlashcardsQuery, FlashcardsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<FlashcardsQuery, FlashcardsQueryVariables>(FlashcardsDocument, options);
+        }
+export type FlashcardsQueryHookResult = ReturnType<typeof useFlashcardsQuery>;
+export type FlashcardsLazyQueryHookResult = ReturnType<typeof useFlashcardsLazyQuery>;
+export type FlashcardsQueryResult = Apollo.QueryResult<FlashcardsQuery, FlashcardsQueryVariables>;

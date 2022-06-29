@@ -51,3 +51,17 @@ mutation Delete_Flashcard($deleteFlashcardId: Int!) {
   }
 }
 `;
+
+
+export const FILTER_QUERY = gql `
+query Flashcards($filter: String) {
+  flashcards(filter: $filter) {
+    flashcards {
+      id
+      answer
+      question
+      isDone
+    }
+  }
+}
+`;

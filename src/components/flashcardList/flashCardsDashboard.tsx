@@ -10,8 +10,7 @@ import Paper from '@mui/material/Paper';
 import Divider from '@mui/material/Divider';
 import IconButton from '@mui/material/IconButton';
 import SearchIcon from '@mui/icons-material/Search';
-import DoneAllIcon from '@mui/icons-material/DoneAll';
-import HighlightOffIcon from '@mui/icons-material/HighlightOff';
+import PreviewIcon from '@mui/icons-material/Preview';
 
 export interface OwnProps {
   handleIdChange: (newId: number) => void;
@@ -23,7 +22,13 @@ interface Props extends OwnProps {
 
 const className = 'LaunchList';
 
-const LaunchList: React.FC<Props> = ({ data, handleIdChange }) => (
+const LaunchList: React.FC<Props> = ({ data, handleIdChange }) => {
+  
+  const [formState, setFormState] = React.useState({
+    rotate: false
+  });
+  
+  return (
   <div className='container'>
   <div className={className}>
     <h3>Flash Cards</h3>
@@ -32,22 +37,32 @@ const LaunchList: React.FC<Props> = ({ data, handleIdChange }) => (
         data.flashcards.flashcards.map(
           (flashcard, i) =>
             !!flashcard && (
-                <CardContainer>
-                <CardContent>
-                  <CardBody>
-                    <CardTitle>{flashcard.question}</CardTitle>
-                    
-                      <CardTitle> {flashcard.answer}</CardTitle>
-                      <AuthorAndTrack>
-                        <AuthorName>Posted By:  {flashcard.answer}</AuthorName>
-                        <AuthorName>
-                          {flashcard.isDone ? <DoneAllIcon sx={{ color: "green"}}/> : <HighlightOffIcon sx={{ color: "red"}}/>}
-                        </AuthorName>
-                      </AuthorAndTrack>
-                    
-                  </CardBody>
-                </CardContent>
-              </CardContainer>
+              <CardContainer>
+              <CardContent>
+                <CardBodyFront>
+                  <CardTitle>{flashcard.question}</CardTitle>
+                  <AuthorAndTrack>
+                    <AuthorName>Posted By: {flashcard.answer}</AuthorName>                 
+                  </AuthorAndTrack>
+                  <PreviewIcon sx={{ color: "blue"}}  onClick={()=>{
+                    setFormState({
+                      ...formState,
+                      rotate: true
+                    })
+                    console.log(formState.rotate)
+                  }} /> hover to view Answer
+                </CardBodyFront>
+                
+                <CardBodyBack>
+
+                  <CardTitle> {flashcard.answer}</CardTitle>
+                  <AuthorAndTrack>
+                    <AuthorName>Posted By: {flashcard.answer}</AuthorName>   
+                  </AuthorAndTrack>
+                </CardBodyBack>
+
+              </CardContent>
+            </CardContainer>
             ),
         )}
     </ol>
@@ -83,78 +98,95 @@ const LaunchList: React.FC<Props> = ({ data, handleIdChange }) => (
 
   </div>
   </div>
-);
+);}
   
 export default LaunchList;
 
 const CardContainer = styled.div({
-    borderRadius: 6,
-    color: colors.text,
-    backgroundSize: 'cover',
-    backgroundColor: 'white',
-    boxShadow: '0px 1px 5px 0px rgba(0,0,0,0.15)',
-    backgroundPosition: 'center',
-    display: 'flex',
-    flexDirection: 'column',
+  borderRadius: 6,
+  color: colors.text,
+  backgroundSize: 'cover',
+  backgroundColor: 'white',
+  boxShadow: '0px 1px 5px 0px rgba(0,0,0,0.15)',
+  backgroundPosition: 'center',
+  display: 'flex',
+  flexDirection: 'column',
+  ':hover': { transform: 'rotateY(360deg)'},
+  justifyContent: 'space-between',
+  [mq[0]]: {
+    width: '90%',
+  },
+  [mq[1]]: {
+    width: '47%',
+  },
+  [mq[2]]: {
+    width: '31%',
+  },
+  [mq[3]]: {
+    width: '100%',
+  },
+  height: 280,
+  margin: 10,
+  overflow: 'hidden',
+  position: 'relative',
+  cursor: 'pointer',
+});
 
-    justifyContent: 'space-between',
-    [mq[0]]: {
-      width: '90%',
-    },
-    [mq[1]]: {
-      width: '47%',
-    },
-    [mq[2]]: {
-      width: '31%',
-    },
-    [mq[3]]: {
-        width: '100%',
-      },
-    height: 280,
-    margin: 10,
-    overflow: 'hidden',
-    position: 'relative',
-    ':hover': {
-      backgroundColor: 'whitesmoke',
-    },
-    cursor: 'pointer',
-  });
-  
-  const CardContent = styled.div({
-    display: 'flex',
-    flexDirection: 'column',
-    justifyContent: 'space-around',
-    height: '100%',
-  });
-  
-  const CardTitle = styled.h3({
-    textAlign: 'center',
-    fontSize: '1.4em',
-    lineHeight: '1em',
-    fontWeight: 700,
-    color: colors.text,
-    flex: 1,
-  });
-  
-  const CardBody = styled.div({
-    padding: 18,
-    flex: 1,
-    display: 'flex',
-    color: colors.textSecondary,
-    flexDirection: 'column',
-    justifyContent: 'space-around',
-  });
-  
-  
-  const AuthorAndTrack = styled.div({
-    display: 'flex',
-    flexDirection: 'column',
-    justifyContent: 'space-between',
-  });
-  
-  const AuthorName = styled.div({
-    lineHeight: '1em',
-    fontSize: '1.1em',
-  });
-  
+const CardContent = styled.div({
+  display: 'flex',
+  flexDirection: 'column',
+  justifyContent: 'space-around',
+  height: '100%',
+  transition: 'transform 15s',
+  transformStyle: 'preserve-3d',
+  // boxShadow: '0 4px 8px 0 rgba(0,0,0,0.2)',
+  ':hover': { transform: 'rotateY(360deg)'} ,
+  position: 'relative',
+});
+
+const CardTitle = styled.h3({
+  textAlign: 'center',
+  fontSize: '1.4em',
+  lineHeight: '1em',
+  fontWeight: 700,
+  color: colors.text,
+  flex: 1,
+});
+
+const CardBodyFront = styled.div({
+  padding: 18,
+  flex: 1,
+  display: 'flex',
+  color: colors.textSecondary,
+  flexDirection: 'column',
+  justifyContent: 'space-around',
+  WebkitBackfaceVisibility : 'hidden',
+  backfaceVisibility:'hidden',
+});
+
+const CardBodyBack= styled.div({
+  padding: 18,
+  flex: 1,
+  display: 'flex',
+  color: colors.textSecondary,
+  flexDirection: 'column',
+  justifyContent: 'space-around',
+  WebkitBackfaceVisibility : 'hidden',
+  backfaceVisibility:'hidden',
+  transform: 'rotateY(180deg)',
+  // position: 'absolute',
+});
+
+const AuthorAndTrack = styled.div({
+  display: 'flex',
+  flexDirection: 'column',
+  justifyContent: 'space-between',
+});
+
+const AuthorName = styled.div({
+  lineHeight: '1em',
+  fontSize: '1.1em',
+});
+
+
   

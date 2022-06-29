@@ -1,8 +1,7 @@
 import { Box, Container, Typography } from '@material-ui/core';
 import * as React from 'react';
 import { Link } from 'react-router-dom';
-import { QueryQuery } from '../generated/graphql';
-import { useQueryQuery } from '../generated/graphql';
+import { QueryQuery,useQueryQuery, useFlashcardsQuery,  FlashcardsQuery } from '../generated/graphql';
 import styled from '@emotion/styled';
 import { colors, mq } from './flashcardList/styles';
 import './flashcardList/styles.css';
@@ -18,8 +17,8 @@ import Input from '@mui/material/Input';
 import Button from '@mui/material/Button';
 import ModeEditTwoToneIcon from '@mui/icons-material/ModeEditTwoTone';
 import DeleteTwoToneIcon from '@mui/icons-material/DeleteTwoTone';
-import { CREATE_FLASHCARD, DELETE_MUTATION  } from './query';
-import { useMutation } from '@apollo/client';
+import { CREATE_FLASHCARD, DELETE_MUTATION, FILTER_QUERY  } from './query';
+import { useMutation,useLazyQuery } from '@apollo/client';
 import SortIcon from '@mui/icons-material/Sort';
 import PreviewIcon from '@mui/icons-material/Preview';
 
@@ -44,9 +43,17 @@ const Dashboard: React.FC<Props> = ({ handleIdChange }) => {
     answer: '',
     display: false,
     id: 0,
-    rotate: false
+    rotate: false,
+    search: true,
+    searchValue: ''
   });
 
+
+  // const [executeSearch, { data }] = useLazyQuery(
+  //   FILTER_QUERY
+  // );
+
+  const [searchFilter, setSearchFilter] =  React.useState('');
 
   const [createFlashcard] = useMutation(CREATE_FLASHCARD, {
       variables: {
@@ -89,11 +96,19 @@ const Dashboard: React.FC<Props> = ({ handleIdChange }) => {
     }
 
     function handleSubmit(event: React.FormEvent<UsernameFormElement>) {
-      event.preventDefault()
+      event.preventDefault();
       createFlashcard();
     }
 
-  const { data, error, loading } = useQueryQuery();
+    function handleSubmitOnSearch(event: React.FormEvent<UsernameFormElement>) {
+      event.preventDefault();
+      // searchFlashcard();
+
+    }
+
+  const { data, error, loading } =  useQueryQuery();
+
+  // const { searchedData, err, dataLoading} = useFlashcardsQuery();
 
   if (loading) {
     return <div>Loading...</div>;
@@ -202,6 +217,7 @@ const Dashboard: React.FC<Props> = ({ handleIdChange }) => {
         <Container>
           <Paper
             component="form"
+            onSubmit={handleSubmitOnSearch}
             sx={{
               p: '2px 4px',
               display: 'flex',
@@ -214,6 +230,8 @@ const Dashboard: React.FC<Props> = ({ handleIdChange }) => {
               sx={{ ml: 1, flex: 1 }}
               placeholder="Search flash card"
               inputProps={{ 'aria-label': 'Search flash card' }}
+              onChange={(e) => setSearchFilter(e.target.value)}
+              // required
             />
             <IconButton type="submit" sx={{ p: '10px' }} aria-label="search">
               <SearchIcon />
