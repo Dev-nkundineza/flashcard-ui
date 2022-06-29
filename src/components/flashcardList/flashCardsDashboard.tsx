@@ -32,7 +32,7 @@ const LaunchList: React.FC<Props> = ({ data, handleIdChange }) => {
   return (
   <div className='container'>
   <div className={className}>
-    <h3>Flash Cards</h3>
+    <h3>Flash Cards </h3>
     <SortIcon/>
     <ol className={`${className}__list`}>
       {!!data.flashcards.flashcards &&
