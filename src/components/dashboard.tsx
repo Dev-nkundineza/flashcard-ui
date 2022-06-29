@@ -365,9 +365,8 @@ const CardContent = styled.div({
   flexDirection: 'column',
   justifyContent: 'space-around',
   height: '100%',
-  transition: 'transform 15s',
+  transition: 'transform 4s',
   transformStyle: 'preserve-3d',
-  // boxShadow: '0 4px 8px 0 rgba(0,0,0,0.2)',
   ':hover': { transform: 'rotateY(180deg)'} ,
   position: 'relative',
 });
