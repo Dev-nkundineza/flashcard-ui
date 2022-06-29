@@ -17,7 +17,7 @@ import Input from '@mui/material/Input';
 import Button from '@mui/material/Button';
 import ModeEditTwoToneIcon from '@mui/icons-material/ModeEditTwoTone';
 import DeleteTwoToneIcon from '@mui/icons-material/DeleteTwoTone';
-import { CREATE_FLASHCARD, DELETE_MUTATION, FILTER_QUERY  } from './query';
+import { CREATE_FLASHCARD, DELETE_MUTATION, FILTER_QUERY, UPDATE_MUTATION  } from './query';
 import { useMutation,useLazyQuery } from '@apollo/client';
 import SortIcon from '@mui/icons-material/Sort';
 import PreviewIcon from '@mui/icons-material/Preview';
@@ -45,7 +45,11 @@ const Dashboard: React.FC<Props> = ({ handleIdChange }) => {
     id: 0,
     rotate: false,
     search: true,
-    searchValue: ''
+    searchValue: '',
+    update: false,
+    oldQuestion: '',
+    oldAnswer: '',
+    updateFlashcardId: 0,
   });
 
 
@@ -64,6 +68,23 @@ const Dashboard: React.FC<Props> = ({ handleIdChange }) => {
          console.dir(err)
       },
       onCompleted: ({ createFlashcard }) => {
+        setFormState({
+          ...formState,
+          login: false
+        });
+      }
+    });
+
+    const [updateCard] = useMutation( UPDATE_MUTATION, {
+      variables: {
+        updateFlashcardId: formState.updateFlashcardId,
+        question: formState.question,
+        answer: formState.answer,
+      },
+      onError: (err)=>{
+         console.dir(err)
+      },
+      onCompleted: ({ updateCard }) => {
         setFormState({
           ...formState,
           login: false
@@ -97,7 +118,7 @@ const Dashboard: React.FC<Props> = ({ handleIdChange }) => {
 
     function handleSubmit(event: React.FormEvent<UsernameFormElement>) {
       event.preventDefault();
-      createFlashcard();
+     { formState.update ?  updateCard() : createFlashcard()} 
     }
 
     function handleSubmitOnSearch(event: React.FormEvent<UsernameFormElement>) {
@@ -151,24 +172,7 @@ const Dashboard: React.FC<Props> = ({ handleIdChange }) => {
                         <CardTitle>{flashcard.question}</CardTitle>
                         <AuthorAndTrack>
                           <AuthorName>Posted By: {flashcard.answer}</AuthorName>
-                          <Icons>
-                            {flashcard.isDone ? (
-                              <DoneAllIcon sx={{ color: 'green' }} />
-                            ) : (
-                              <HighlightOffIcon sx={{ color: 'red' }} />
-                            )}
-                            
-                            <ModeEditTwoToneIcon sx={{ marginLeft: '10px', color: "blue"}}/> <Typography> Edit</Typography> 
-                            
-                            
-                            <DeleteTwoToneIcon sx={{ marginLeft: '10px', color: "red"}}/> <Typography onClick={()=>deleteFlashcard({
-                               variables: {
-                                deleteFlashcardId: flashcard.id,                               
-                              },
-                            }) }
-                            >  Delete</Typography> 
-                            
-                          </Icons>
+      
                           
                         </AuthorAndTrack>
                         <PreviewIcon sx={{ color: "blue"}}  onClick={()=>{
@@ -185,7 +189,7 @@ const Dashboard: React.FC<Props> = ({ handleIdChange }) => {
                         <CardTitle> {flashcard.answer}</CardTitle>
                         <AuthorAndTrack>
                           <AuthorName>Posted By: {flashcard.answer}</AuthorName>
-                          <Icons>
+                          {/* <Icons>
                             {flashcard.isDone ? (
                               <DoneAllIcon sx={{ color: 'green' }} />
                             ) : (
@@ -202,12 +206,39 @@ const Dashboard: React.FC<Props> = ({ handleIdChange }) => {
                             }) }
                             >  Delete</Typography> 
                             
-                          </Icons>
+                          </Icons> */}
                           
                         </AuthorAndTrack>
                       </CardBodyBack>
-
+                      
                     </CardContent>
+
+                    <Icons>
+                            {flashcard.isDone ? (
+                              <DoneAllIcon sx={{ color: 'green' }} />
+                            ) : (
+                              <HighlightOffIcon sx={{ color: 'red' }} />
+                            )}
+                            
+                            <ModeEditTwoToneIcon sx={{ marginLeft: '10px', color: "blue"}}  onClick={()=> {
+                              setFormState({
+                                ...formState,
+                                oldAnswer: flashcard.answer,
+                                oldQuestion: flashcard.question,
+                                update: !formState.update,
+                                display: !formState.display,
+                                updateFlashcardId: flashcard.id,
+                                 }) }}/> <Typography> Edit</Typography> 
+                            
+                            
+                            <DeleteTwoToneIcon sx={{ marginLeft: '10px', color: "red"}}/> <Typography onClick={()=>deleteFlashcard({
+                               variables: {
+                                deleteFlashcardId: flashcard.id,                               
+                              },
+                            }) }
+                            >  Delete</Typography> 
+                            
+                          </Icons>
                   </CardContainer>
                 )
             )}
@@ -265,8 +296,8 @@ const Dashboard: React.FC<Props> = ({ handleIdChange }) => {
             onSubmit={ handleSubmit }
           >
             <Input
-             value= { formState.question} 
-             placeholder="question"
+             value= { formState.question } 
+             placeholder= { formState.update? formState.oldQuestion : "Question" } 
              inputProps={ariaLabel} 
              onChange={(e) =>
               setFormState({
@@ -275,8 +306,8 @@ const Dashboard: React.FC<Props> = ({ handleIdChange }) => {
               })}
             />
             <Input
-              value = {formState.answer}
-              placeholder="answer"
+              value =  { formState.answer }
+              placeholder={ formState.update? formState.oldAnswer : "Answer" }
               inputProps={ariaLabel}
               sx={{ marginTop: '40px' }}
               onChange={(e) =>
@@ -290,7 +321,7 @@ const Dashboard: React.FC<Props> = ({ handleIdChange }) => {
               type='submit'
               sx={{ marginTop: '40px', backgroundColor: '#4169e1' }}
             >
-              Add Flashcard
+             {formState.update ? "Update card" : "Add flashcard "} 
             </Button>
           </Box>
         </Container>
@@ -308,7 +339,7 @@ const CardContainer = styled.div({
   backgroundPosition: 'center',
   display: 'flex',
   flexDirection: 'column',
-  ':hover': { transform: 'rotateY(360deg)'},
+  // ':hover': { transform: 'rotateY(360deg)'},
   justifyContent: 'space-between',
   [mq[0]]: {
     width: '90%',
@@ -322,7 +353,7 @@ const CardContainer = styled.div({
   [mq[3]]: {
     width: '100%',
   },
-  height: 280,
+  height: 300,
   margin: 10,
   overflow: 'hidden',
   position: 'relative',
@@ -337,7 +368,7 @@ const CardContent = styled.div({
   transition: 'transform 15s',
   transformStyle: 'preserve-3d',
   // boxShadow: '0 4px 8px 0 rgba(0,0,0,0.2)',
-  ':hover': { transform: 'rotateY(360deg)'} ,
+  ':hover': { transform: 'rotateY(180deg)'} ,
   position: 'relative',
 });
 

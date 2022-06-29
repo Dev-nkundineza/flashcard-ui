@@ -65,3 +65,13 @@ query Flashcards($filter: String) {
   }
 }
 `;
+
+
+export const UPDATE_MUTATION =gql `
+mutation UpdateMutation($updateFlashcardId: Int!, $question: String, $answer: String) {
+  updateFlashcard(id: $updateFlashcardId, question: $question, answer: $answer) {
+    question
+    answer
+  }
+}
+`;
