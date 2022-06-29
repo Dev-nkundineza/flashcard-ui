@@ -11,6 +11,7 @@ import Divider from '@mui/material/Divider';
 import IconButton from '@mui/material/IconButton';
 import SearchIcon from '@mui/icons-material/Search';
 import PreviewIcon from '@mui/icons-material/Preview';
+import SortIcon from '@mui/icons-material/Sort';
 
 export interface OwnProps {
   handleIdChange: (newId: number) => void;
@@ -32,6 +33,7 @@ const LaunchList: React.FC<Props> = ({ data, handleIdChange }) => {
   <div className='container'>
   <div className={className}>
     <h3>Flash Cards</h3>
+    <SortIcon/>
     <ol className={`${className}__list`}>
       {!!data.flashcards.flashcards &&
         data.flashcards.flashcards.map(
