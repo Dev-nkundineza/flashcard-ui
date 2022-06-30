@@ -260,7 +260,7 @@ const Dashboard: React.FC<Props> = ({ handleIdChange }) => {
       </div>
       <div className="rightSide">
         <Container>
-          <Paper
+          {/* <Paper
             component="form"
             onSubmit={handleSubmitOnSearch}
             sx={{
@@ -282,7 +282,7 @@ const Dashboard: React.FC<Props> = ({ handleIdChange }) => {
               <SearchIcon />
             </IconButton>
             <Divider sx={{ height: 28, m: 0.5 }} orientation="vertical" />
-          </Paper>
+          </Paper> */}
           <Box
             sx={{
               display: 'flex',

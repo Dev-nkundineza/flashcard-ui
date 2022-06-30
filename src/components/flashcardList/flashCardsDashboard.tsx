@@ -71,7 +71,7 @@ const LaunchList: React.FC<Props> = ({ data, handleIdChange }) => {
   </div>
   <div className='rightSide'>
     <Container>
-    <Paper
+    {/* <Paper
       component="form"
       sx={{ p: '2px 4px', display: 'flex', alignItems: 'center', width: 400, marginBottom: "70px" }}
     >
@@ -84,7 +84,7 @@ const LaunchList: React.FC<Props> = ({ data, handleIdChange }) => {
         <SearchIcon />
       </IconButton>
       <Divider sx={{ height: 28, m: 0.5 }} orientation="vertical" />
-    </Paper>
+    </Paper> */}
       <Box sx ={{ display: "flex" , flexDirection: "column", justifyContent: "spaceBetween"}}>
       <Typography>
         Enjoy using this flashcard application
