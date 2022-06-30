@@ -11,6 +11,9 @@ import { useNavigate } from 'react-router-dom';
 import { LOGIN_MUTATION, SIGNUP_MUTATION }from './query';
 import { AUTH_TOKEN } from '../constants';
 import { useMutation } from "@apollo/client";
+import { toast } from 'react-toastify';
+import { LoadingButton } from '@mui/lab';
+
 
   const useStyles = makeStyles((theme) => ({
    
@@ -36,7 +39,8 @@ import { useMutation } from "@apollo/client";
       login: true,
       email: '',
       password: '',
-      name: ''
+      name: '',
+      isLoading: false
     });
 
     const [login] = useMutation(LOGIN_MUTATION, {
@@ -46,8 +50,26 @@ import { useMutation } from "@apollo/client";
       },
       onCompleted: ({ login }) => {
         localStorage.setItem(AUTH_TOKEN, login.token);
+         toast.success('successfully Login', {
+          position: 'top-center',
+          autoClose: 2000,
+        });
         navigate('/dashboard');
-      }
+      },
+
+      onError: (error)=>{
+        toast.error('invalid email or password', {
+          position: 'top-center',
+          autoClose: 2000,
+        });
+        setFormState({
+          ...formState,
+          email: '',
+          name: '',
+          password: '',
+          isLoading: false,
+        });
+      },
     });
 
     const [signup] = useMutation(SIGNUP_MUTATION, {
@@ -56,17 +78,35 @@ import { useMutation } from "@apollo/client";
         email: formState.email,
         password: formState.password
       },
-      onError: (err)=>{
-         console.dir(err)
-      },
       onCompleted: ({ signup }) => {
-        localStorage.setItem(AUTH_TOKEN, signup.token);
+        toast.success('successfully registered', {
+          position: 'top-center',
+          autoClose: 2000,
+        });
+
         setFormState({
           ...formState,
-          login: false
+          email: '',
+          name: '',
+          password: '',
+          isLoading: false,
+          login: true
         });
         navigate('/signin');
-      }
+      },
+      onError: (error)=>{
+        toast.error('user already exist', {
+          position: 'top-center',
+          autoClose: 2000,
+        });
+        setFormState({
+          ...formState,
+          email: '',
+          name: '',
+          password: '',
+          isLoading: false,
+        });
+      },
     });
 
     const { heading, submitButton } = useStyles();
@@ -80,6 +120,10 @@ import { useMutation } from "@apollo/client";
 
     function handleSubmit(event: React.FormEvent<UsernameFormElement>) {
       event.preventDefault()
+      setFormState({
+        ...formState,
+        isLoading: true
+      });
       formState.login ? login().then((data)=>{
         console.log(data)
       }).catch(e=> console.log(e)) :
@@ -134,15 +178,16 @@ import { useMutation } from "@apollo/client";
             fullWidth
             required
           />
-          <Button
+          <LoadingButton
             type="submit"
             fullWidth
             variant="contained"
+            loading={formState.isLoading}
             // onClick={ ()=>login() }
             className={submitButton}
           >
             {formState.login ? 'login' : 'create account'}
-          </Button>
+          </LoadingButton>
           <Button
             type="submit"
             fullWidth

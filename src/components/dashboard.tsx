@@ -17,10 +17,14 @@ import Input from '@mui/material/Input';
 import Button from '@mui/material/Button';
 import ModeEditTwoToneIcon from '@mui/icons-material/ModeEditTwoTone';
 import DeleteTwoToneIcon from '@mui/icons-material/DeleteTwoTone';
-import { CREATE_FLASHCARD, DELETE_MUTATION, FILTER_QUERY, UPDATE_MUTATION  } from './query';
+import { CREATE_FLASHCARD, DELETE_MUTATION, FILTER_QUERY, UPDATE_MUTATION ,QUERY_LAUNCH_LIST } from './query';
 import { useMutation,useLazyQuery } from '@apollo/client';
 import SortIcon from '@mui/icons-material/Sort';
 import PreviewIcon from '@mui/icons-material/Preview';
+import { useDispatch, useSelector } from 'react-redux';
+import {
+  ownFlashcards,
+} from '../redux/actions/flashcardAction';
 
 export interface OwnProps {
   handleIdChange: (newId: number) => void;
@@ -37,6 +41,9 @@ const ariaLabel = { 'aria-label': 'description' };
 const Dashboard: React.FC<Props> = ({ handleIdChange }) => {
   // state management
 
+  const dispatch = useDispatch();
+  const flashCards = useSelector((state: any) => state.flashcards);
+  const [getMyFlashCards] = useLazyQuery(QUERY_LAUNCH_LIST, {});
   const [formState, setFormState] = React.useState({
     login: true,
     question: '',
@@ -50,7 +57,12 @@ const Dashboard: React.FC<Props> = ({ handleIdChange }) => {
     oldQuestion: '',
     oldAnswer: '',
     updateFlashcardId: 0,
+    createCard: false,
+    deleteCard: false,
+    editCard: false
   });
+
+  const [myData, setMyData] = React.useState(null)
 
 
   // const [executeSearch, { data }] = useLazyQuery(
@@ -70,7 +82,9 @@ const Dashboard: React.FC<Props> = ({ handleIdChange }) => {
       onCompleted: ({ createFlashcard }) => {
         setFormState({
           ...formState,
-          login: false
+          createCard: true,
+          login: false,
+          
         });
       }
     });
@@ -87,7 +101,8 @@ const Dashboard: React.FC<Props> = ({ handleIdChange }) => {
       onCompleted: ({ updateCard }) => {
         setFormState({
           ...formState,
-          login: false
+          login: false,
+          editCard: true,
         });
       }
     });
@@ -104,7 +119,8 @@ const Dashboard: React.FC<Props> = ({ handleIdChange }) => {
         onCompleted: ({ deleteFlashcard }) => {
           setFormState({
             ...formState,
-            login: false
+            login: false,
+            deleteCard: true
           });
         }
       });
@@ -127,7 +143,23 @@ const Dashboard: React.FC<Props> = ({ handleIdChange }) => {
 
     }
 
+
   const { data, error, loading } =  useQueryQuery();
+  
+
+  React.useEffect(():any=>{
+    getMyFlashCards({
+      fetchPolicy: 'network-only',
+      onCompleted: (data) => {
+        console.log(data, 'getMyFlashCards');
+        data && dispatch(ownFlashcards(data.myFeed));
+       
+      },
+      onError: (error) => {
+        console.log(error, 'error');
+      },
+    });
+    }, [formState.createCard,formState.editCard, formState.deleteCard])
 
   // const { searchedData, err, dataLoading} = useFlashcardsQuery();
 
@@ -189,24 +221,6 @@ const Dashboard: React.FC<Props> = ({ handleIdChange }) => {
                         <CardTitle> {flashcard.answer}</CardTitle>
                         <AuthorAndTrack>
                           <AuthorName>Posted By: {flashcard.answer}</AuthorName>
-                          {/* <Icons>
-                            {flashcard.isDone ? (
-                              <DoneAllIcon sx={{ color: 'green' }} />
-                            ) : (
-                              <HighlightOffIcon sx={{ color: 'red' }} />
-                            )}
-                            
-                            <ModeEditTwoToneIcon sx={{ marginLeft: '10px'}}/> <Typography> Edit</Typography> 
-                            
-                            
-                            <DeleteTwoToneIcon sx={{ marginLeft: '10px'}}/> <Typography onClick={()=>deleteFlashcard({
-                               variables: {
-                                deleteFlashcardId: flashcard.id,                               
-                              },
-                            }) }
-                            >  Delete</Typography> 
-                            
-                          </Icons> */}
                           
                         </AuthorAndTrack>
                       </CardBodyBack>

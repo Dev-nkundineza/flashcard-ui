@@ -5,6 +5,8 @@ import CssBaseline from "@material-ui/core/CssBaseline";
 import './index.css';
 import App from './App';
 import { setContext } from '@apollo/client/link/context';
+import { Provider } from 'react-redux';
+import store from '../src/redux/store';
 
 
 const httpLink = createHttpLink({
@@ -30,10 +32,12 @@ const client = new ApolloClient({
 });
 
 ReactDOM.render(
+  <Provider store={store}>
   <ApolloProvider client={client}>
   <CssBaseline/>
   <App />  
-  </ApolloProvider>,
+  </ApolloProvider>
+  </Provider>,
   document.getElementById('root'),
 );
 
