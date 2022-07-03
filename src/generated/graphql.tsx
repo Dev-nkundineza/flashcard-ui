@@ -154,6 +154,22 @@ export type FlashcardsQueryVariables = Exact<{
 
 export type FlashcardsQuery = { __typename?: 'Query', flashcards: { __typename?: 'AllFlashcards', flashcards: Array<{ __typename?: 'Flashcard', id: number, answer: string, question: string, isDone: boolean }> } };
 
+export type UpdateMutationMutationVariables = Exact<{
+  updateFlashcardId: Scalars['Int'];
+  question?: InputMaybe<Scalars['String']>;
+  answer?: InputMaybe<Scalars['String']>;
+}>;
+
+
+export type UpdateMutationMutation = { __typename?: 'Mutation', updateFlashcard: { __typename?: 'Flashcard', question: string, answer: string } };
+
+export type SortQueryQueryVariables = Exact<{
+  orderBy?: InputMaybe<Array<FlashcardOrderByInput> | FlashcardOrderByInput>;
+}>;
+
+
+export type SortQueryQuery = { __typename?: 'Query', flashcards: { __typename?: 'AllFlashcards', flashcards: Array<{ __typename?: 'Flashcard', id: number, question: string, answer: string, isDone: boolean }> } };
+
 
 export const QueryDocument = gql`
     query Query {
@@ -375,3 +391,79 @@ export function useFlashcardsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions
 export type FlashcardsQueryHookResult = ReturnType<typeof useFlashcardsQuery>;
 export type FlashcardsLazyQueryHookResult = ReturnType<typeof useFlashcardsLazyQuery>;
 export type FlashcardsQueryResult = Apollo.QueryResult<FlashcardsQuery, FlashcardsQueryVariables>;
+export const UpdateMutationDocument = gql`
+    mutation UpdateMutation($updateFlashcardId: Int!, $question: String, $answer: String) {
+  updateFlashcard(id: $updateFlashcardId, question: $question, answer: $answer) {
+    question
+    answer
+  }
+}
+    `;
+export type UpdateMutationMutationFn = Apollo.MutationFunction<UpdateMutationMutation, UpdateMutationMutationVariables>;
+
+/**
+ * __useUpdateMutationMutation__
+ *
+ * To run a mutation, you first call `useUpdateMutationMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateMutationMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateMutationMutation, { data, loading, error }] = useUpdateMutationMutation({
+ *   variables: {
+ *      updateFlashcardId: // value for 'updateFlashcardId'
+ *      question: // value for 'question'
+ *      answer: // value for 'answer'
+ *   },
+ * });
+ */
+export function useUpdateMutationMutation(baseOptions?: Apollo.MutationHookOptions<UpdateMutationMutation, UpdateMutationMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<UpdateMutationMutation, UpdateMutationMutationVariables>(UpdateMutationDocument, options);
+      }
+export type UpdateMutationMutationHookResult = ReturnType<typeof useUpdateMutationMutation>;
+export type UpdateMutationMutationResult = Apollo.MutationResult<UpdateMutationMutation>;
+export type UpdateMutationMutationOptions = Apollo.BaseMutationOptions<UpdateMutationMutation, UpdateMutationMutationVariables>;
+export const SortQueryDocument = gql`
+    query SortQuery($orderBy: [FlashcardOrderByInput!]) {
+  flashcards(orderBy: $orderBy) {
+    flashcards {
+      id
+      question
+      answer
+      isDone
+    }
+  }
+}
+    `;
+
+/**
+ * __useSortQueryQuery__
+ *
+ * To run a query within a React component, call `useSortQueryQuery` and pass it any options that fit your needs.
+ * When your component renders, `useSortQueryQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useSortQueryQuery({
+ *   variables: {
+ *      orderBy: // value for 'orderBy'
+ *   },
+ * });
+ */
+export function useSortQueryQuery(baseOptions?: Apollo.QueryHookOptions<SortQueryQuery, SortQueryQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<SortQueryQuery, SortQueryQueryVariables>(SortQueryDocument, options);
+      }
+export function useSortQueryLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<SortQueryQuery, SortQueryQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<SortQueryQuery, SortQueryQueryVariables>(SortQueryDocument, options);
+        }
+export type SortQueryQueryHookResult = ReturnType<typeof useSortQueryQuery>;
+export type SortQueryLazyQueryHookResult = ReturnType<typeof useSortQueryLazyQuery>;
+export type SortQueryQueryResult = Apollo.QueryResult<SortQueryQuery, SortQueryQueryVariables>;

@@ -1,7 +1,10 @@
-import { Box, Container, Typography } from '@material-ui/core';
+import { Box, Container, ListItemText, Typography } from '@material-ui/core';
 import * as React from 'react';
 import { Link } from 'react-router-dom';
-import { QueryQuery,useQueryQuery, useFlashcardsQuery,  FlashcardsQuery } from '../generated/graphql';
+import {
+  QueryQuery,
+  useQueryQuery,
+} from '../generated/graphql';
 import styled from '@emotion/styled';
 import { colors, mq } from './flashcardList/styles';
 import './flashcardList/styles.css';
@@ -17,14 +20,26 @@ import Input from '@mui/material/Input';
 import Button from '@mui/material/Button';
 import ModeEditTwoToneIcon from '@mui/icons-material/ModeEditTwoTone';
 import DeleteTwoToneIcon from '@mui/icons-material/DeleteTwoTone';
-import { CREATE_FLASHCARD, DELETE_MUTATION, FILTER_QUERY, UPDATE_MUTATION ,QUERY_LAUNCH_LIST } from './query';
-import { useMutation,useLazyQuery } from '@apollo/client';
+import {
+  CREATE_FLASHCARD,
+  DELETE_MUTATION,
+  SORT_QUERY,
+  UPDATE_MUTATION,
+  QUERY_LAUNCH_LIST,
+} from './query';
+import { useMutation, useLazyQuery } from '@apollo/client';
 import SortIcon from '@mui/icons-material/Sort';
 import PreviewIcon from '@mui/icons-material/Preview';
 import { useDispatch, useSelector } from 'react-redux';
-import {
-  ownFlashcards,
-} from '../redux/actions/flashcardAction';
+import { ownFlashcards, sorted } from '../redux/actions/flashcardAction';
+import List from '@mui/material/List';
+import ListItemButton from '@mui/material/ListItemButton';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import Collapse from '@mui/material/Collapse';
+import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+
+
 
 export interface OwnProps {
   handleIdChange: (newId: number) => void;
@@ -37,12 +52,12 @@ interface Props extends OwnProps {
 const className = 'LaunchList';
 const ariaLabel = { 'aria-label': 'description' };
 
-
 const Dashboard: React.FC<Props> = ({ handleIdChange }) => {
   // state management
-
+  const { data, error, loading } = useQueryQuery();
   const dispatch = useDispatch();
-  const flashCards = useSelector((state: any) => state.flashcards);
+  const sortedData = useSelector((state: any) => state.flashcards.sorted);
+  const flashcardFetched = useSelector((state: any)=> state.flashcards.myFlashcards);
   const [getMyFlashCards] = useLazyQuery(QUERY_LAUNCH_LIST, {});
   const [formState, setFormState] = React.useState({
     login: true,
@@ -59,110 +74,140 @@ const Dashboard: React.FC<Props> = ({ handleIdChange }) => {
     updateFlashcardId: 0,
     createCard: false,
     deleteCard: false,
-    editCard: false
+    editCard: false,
   });
-
-  const [myData, setMyData] = React.useState(null)
-
+  const [open, setOpen] = React.useState(false);
+  const [sort, setSort] = React.useState(false);
 
   // const [executeSearch, { data }] = useLazyQuery(
   //   FILTER_QUERY
   // );
 
-  const [searchFilter, setSearchFilter] =  React.useState('');
+  const handleClick = () => {
+    setOpen(!open);
+  };
+  const [getSortedFlashCards] = useLazyQuery(SORT_QUERY, {
 
+  });
   const [createFlashcard] = useMutation(CREATE_FLASHCARD, {
-      variables: {
-        question: formState.question,
-        answer: formState.answer,
-      },
-      onError: (err)=>{
-         console.dir(err)
-      },
-      onCompleted: ({ createFlashcard }) => {
-        setFormState({
-          ...formState,
-          createCard: true,
-          login: false,
-          
-        });
-      }
-    });
-
-    const [updateCard] = useMutation( UPDATE_MUTATION, {
-      variables: {
-        updateFlashcardId: formState.updateFlashcardId,
-        question: formState.question,
-        answer: formState.answer,
-      },
-      onError: (err)=>{
-         console.dir(err)
-      },
-      onCompleted: ({ updateCard }) => {
-        setFormState({
-          ...formState,
-          login: false,
-          editCard: true,
-        });
-      }
-    });
-
-    
-       const [deleteFlashcard]=  useMutation(DELETE_MUTATION, {
-        variables: {
-          deleteFlashcardId: 0,
-          
-        },
-        onError: (err)=>{
-           console.dir(err)
-        },
-        onCompleted: ({ deleteFlashcard }) => {
-          setFormState({
-            ...formState,
-            login: false,
-            deleteCard: true
-          });
-        }
+    variables: {
+      question: formState.question,
+      answer: formState.answer,
+    },
+    onError: (err) => {
+      console.dir(err);
+    },
+    onCompleted: ({ createFlashcard }) => {
+      setFormState({
+        ...formState,
+        createCard: !formState.createCard,
+        login: false,
       });
+    },
+  });
 
-    interface FormElements extends HTMLFormControlsCollection {
-      usernameInput: HTMLInputElement
+  const [updateCard] = useMutation(UPDATE_MUTATION, {
+    variables: {
+      updateFlashcardId: formState.updateFlashcardId,
+      question: formState.question,
+      answer: formState.answer,
+    },
+    onError: (err) => {
+      console.dir(err);
+    },
+    onCompleted: ({ updateCard }) => {
+      setFormState({
+        ...formState,
+        login: false,
+        editCard: !formState.editCard,
+      });
+    },
+  });
+
+  const [deleteFlashcard] = useMutation(DELETE_MUTATION, {
+    variables: {
+      deleteFlashcardId: 0,
+    },
+    onError: (err) => {
+      console.dir(err);
+    },
+    onCompleted: ({ deleteFlashcard }) => {
+      setFormState({
+        ...formState,
+        login: false,
+        deleteCard: !formState.deleteCard,
+      });
+    },
+  });
+ 
+  interface FormElements extends HTMLFormControlsCollection {
+    usernameInput: HTMLInputElement;
+  }
+  interface UsernameFormElement extends HTMLFormElement {
+    readonly elements: FormElements;
+  }
+
+  function handleSubmit(event: React.FormEvent<UsernameFormElement>) {
+    event.preventDefault();
+    // eslint-disable-next-line no-lone-blocks
+    {
+      formState.update ? updateCard() : createFlashcard();
+      setFormState({
+        ...formState,
+        display: false,
+        question: '',
+        answer: '',
+      })
     }
-    interface UsernameFormElement extends HTMLFormElement {
-      readonly elements: FormElements
+  }
+
+  function handleSubmitOnSearch(event: React.FormEvent<UsernameFormElement>) {
+    event.preventDefault();
+    // searchFlashcard();
+  }
+
+    const fetchSortedFlashCards = (order: any)=>{
+      getSortedFlashCards({
+        fetchPolicy: 'network-only',
+        variables: {
+          "orderBy": [
+            {
+              "question": order
+            }
+          ]
+        },
+        onCompleted: ( data1 ) => {
+        const filtered = data1.flashcards.flashcards
+        setSort(true);
+        setOpen(!open);
+         data && dispatch(
+        sorted(
+          filtered
+        )
+      )
+      setFormState({
+        ...formState,
+        editCard: true,
+      });
+      },onError:(error)=>{
+        console.log(error,'my error')
+      }})
     }
-
-    function handleSubmit(event: React.FormEvent<UsernameFormElement>) {
-      event.preventDefault();
-     { formState.update ?  updateCard() : createFlashcard()} 
-    }
-
-    function handleSubmitOnSearch(event: React.FormEvent<UsernameFormElement>) {
-      event.preventDefault();
-      // searchFlashcard();
-
-    }
-
-
-  const { data, error, loading } =  useQueryQuery();
   
-
-  React.useEffect(():any=>{
-    getMyFlashCards({
-      fetchPolicy: 'network-only',
-      onCompleted: (data) => {
-        console.log(data, 'getMyFlashCards');
-        data && dispatch(ownFlashcards(data.myFeed));
-       
-      },
-      onError: (error) => {
-        console.log(error, 'error');
-      },
-    });
-    }, [formState.createCard,formState.editCard, formState.deleteCard])
-
-  // const { searchedData, err, dataLoading} = useFlashcardsQuery();
-
+    React.useEffect(():any=>{
+      getMyFlashCards({
+        fetchPolicy: 'network-only',
+        onCompleted: (data) => {
+          // console.log(data.flashcards.flashcards);
+          data && dispatch(ownFlashcards(data.flashcards.flashcards));
+         
+        },
+        onError: (error) => {
+          console.log(error, 'error');
+        },
+      });
+      }, [formState.createCard, formState.editCard, formState.deleteCard, getMyFlashCards, dispatch])
+ 
   if (loading) {
     return <div>Loading...</div>;
   }
@@ -171,13 +216,165 @@ const Dashboard: React.FC<Props> = ({ handleIdChange }) => {
     return <div>ERROR</div>;
   }
 
+const dataToReturn = ()=>{
+  return sort ? (
+<>
+    <ol className={`${className}__list`}>
+          {!!sortedData &&
+            sortedData.map(
+              (flashcard: any, i: any) =>
+                !!flashcard && (
+                  <CardContainer>
+                    <CardContent>
+                      <CardBodyFront>
+                        <CardTitle>{flashcard.question}</CardTitle>
+                        <AuthorAndTrack>
+                          <AuthorName>Posted By: {flashcard.postedBy.name}</AuthorName>
+                        </AuthorAndTrack>
+                        <PreviewIcon
+                          sx={{ color: 'blue' }}
+                          onClick={() => {
+                            setFormState({
+                              ...formState,
+                              rotate: true,
+                            });
+                          }}
+                        />{' '}
+                        hover to view Answer
+                      </CardBodyFront>
+
+                      <CardBodyBack>
+                        <CardTitle> {flashcard.answer}</CardTitle>
+                        <AuthorAndTrack>
+                          <AuthorName>Posted By: {flashcard.postedBy.name}</AuthorName>
+                        </AuthorAndTrack>
+                      </CardBodyBack>
+                    </CardContent>
+
+                    <Icons>
+                      {flashcard.isDone ? (
+                        <DoneAllIcon sx={{ color: 'green' }} />
+                      ) : (
+                        <HighlightOffIcon sx={{ color: 'red' }} />
+                      )}
+                      <ModeEditTwoToneIcon
+                        sx={{ marginLeft: '10px', color: 'blue' }}
+                        onClick={() => {
+                          setFormState({
+                            ...formState,
+                            oldAnswer: flashcard.answer,
+                            oldQuestion: flashcard.question,
+                            update: !formState.update,
+                            display: !formState.display,
+                            updateFlashcardId: flashcard.id,
+                          });
+                        }}
+                      />{' '}
+                      <Typography> Edit</Typography>
+                      <DeleteTwoToneIcon
+                        sx={{ marginLeft: '10px', color: 'red' }}
+                      />{' '}
+                      <Typography
+                        onClick={() =>
+                          deleteFlashcard({
+                            variables: {
+                              deleteFlashcardId: flashcard.id
+                            },
+                          })
+                        }
+                      >
+                        {' '}
+                        Delete
+                      </Typography>
+                    </Icons>
+                  </CardContainer>
+                )
+            )}
+        </ol>
+        </>
+  ): (
+    <>
+    <ol className={`${className}__list`}>
+          {!!flashcardFetched &&
+            flashcardFetched?.map(
+              (flashcard: any, i: any) =>
+                !!flashcard && (
+                  <CardContainer>
+                    <CardContent>
+                      <CardBodyFront>
+                        <CardTitle>{flashcard.question}</CardTitle>
+                        <AuthorAndTrack>
+                          <AuthorName>Posted By: {flashcard.postedBy.name}</AuthorName>
+                        </AuthorAndTrack>
+                        <PreviewIcon
+                          sx={{ color: 'blue' }}
+                          onClick={() => {
+                            setFormState({
+                              ...formState,
+                              rotate: true,
+                            });
+                          }}
+                        />{' '}
+                        hover to view Answer
+                      </CardBodyFront>
+
+                      <CardBodyBack>
+                        <CardTitle> {flashcard.answer}</CardTitle>
+                        <AuthorAndTrack>
+                          <AuthorName>Posted By: {flashcard.postedBy.name}</AuthorName>
+                        </AuthorAndTrack>
+                      </CardBodyBack>
+                    </CardContent>
+
+                    <Icons>
+                      {flashcard.isDone ? (
+                        <DoneAllIcon sx={{ color: 'green' }} />
+                      ) : (
+                        <HighlightOffIcon sx={{ color: 'red' }} />
+                      )}
+                      <ModeEditTwoToneIcon
+                        sx={{ marginLeft: '10px', color: 'blue' }}
+                        onClick={() => {
+                          setFormState({
+                            ...formState,
+                            oldAnswer: flashcard.answer,
+                            oldQuestion: flashcard.question,
+                            update: true,
+                            display: !formState.display,
+                            updateFlashcardId: flashcard.id,
+                          });
+                        }}
+                      />{' '}
+                      <Typography> Edit</Typography>
+                      <DeleteTwoToneIcon
+                        sx={{ marginLeft: '10px', color: 'red' }}
+                      />{' '}
+                      <Typography
+                        onClick={() =>
+                          deleteFlashcard({
+                            variables: {
+                              deleteFlashcardId: flashcard.id
+                            },
+                          })
+                        }
+                      >
+                        {' '}
+                        Delete
+                      </Typography>
+                    </Icons>
+                  </CardContainer>
+                )
+            )}
+        </ol>
+        </>
+  );
+}
   return (
     <div className="container">
       <Box
         className="sideMenu"
         onClick={() => {
-          setFormState({ ...formState, display: !formState.display });
-          console.log(formState.display);
+          setFormState({ ...formState, display: !formState.display , update: false});
         }}
       >
         <AddCircleTwoToneIcon
@@ -192,71 +389,28 @@ const Dashboard: React.FC<Props> = ({ handleIdChange }) => {
       </Box>
       <div className={className}>
         <h3>Flash Cards</h3>
-        <SortIcon/>
-        <ol className={`${className}__list`}>
-          {!!data.flashcards.flashcards &&
-            data.flashcards.flashcards.map(
-              (flashcard, i) =>
-                !!flashcard && (
-                  <CardContainer>
-                    <CardContent>
-                      <CardBodyFront>
-                        <CardTitle>{flashcard.question}</CardTitle>
-                        <AuthorAndTrack>
-                          <AuthorName>Posted By: {flashcard.answer}</AuthorName>
-      
-                          
-                        </AuthorAndTrack>
-                        <PreviewIcon sx={{ color: "blue"}}  onClick={()=>{
-                          setFormState({
-                            ...formState,
-                            rotate: true
-                          })
-                          console.log(formState.rotate)
-                        }} /> hover to view Answer
-                      </CardBodyFront>
-                      
-                      <CardBodyBack>
-
-                        <CardTitle> {flashcard.answer}</CardTitle>
-                        <AuthorAndTrack>
-                          <AuthorName>Posted By: {flashcard.answer}</AuthorName>
-                          
-                        </AuthorAndTrack>
-                      </CardBodyBack>
-                      
-                    </CardContent>
-
-                    <Icons>
-                            {flashcard.isDone ? (
-                              <DoneAllIcon sx={{ color: 'green' }} />
-                            ) : (
-                              <HighlightOffIcon sx={{ color: 'red' }} />
-                            )}
-                            
-                            <ModeEditTwoToneIcon sx={{ marginLeft: '10px', color: "blue"}}  onClick={()=> {
-                              setFormState({
-                                ...formState,
-                                oldAnswer: flashcard.answer,
-                                oldQuestion: flashcard.question,
-                                update: !formState.update,
-                                display: !formState.display,
-                                updateFlashcardId: flashcard.id,
-                                 }) }}/> <Typography> Edit</Typography> 
-                            
-                            
-                            <DeleteTwoToneIcon sx={{ marginLeft: '10px', color: "red"}}/> <Typography onClick={()=>deleteFlashcard({
-                               variables: {
-                                deleteFlashcardId: flashcard.id,                               
-                              },
-                            }) }
-                            >  Delete</Typography> 
-                            
-                          </Icons>
-                  </CardContainer>
-                )
-            )}
-        </ol>
+        Click to Sort:
+        <SortIcon onClick={handleClick}/>
+        <List>
+          <Collapse in={open} timeout="auto" unmountOnExit>
+            <List component="div" disablePadding>
+              <ListItemButton sx={{ pl: 4 }}>
+                <ListItemIcon>
+                  <ArrowDropUpIcon />
+                </ListItemIcon>
+                <ListItemText primary="Ascending" onClick={()=>fetchSortedFlashCards("asc")}/>
+              </ListItemButton>
+              <ListItemButton sx={{ pl: 4 }}>
+                <ListItemIcon>
+                  <ArrowDropDownIcon />
+                </ListItemIcon>
+                <ListItemText primary="Descending" onClick={()=>
+                  fetchSortedFlashCards("desc") }/>
+              </ListItemButton>
+            </List>
+          </Collapse>
+        </List>
+        {dataToReturn()}
       </div>
       <div className="rightSide">
         <Container>
@@ -275,7 +429,6 @@ const Dashboard: React.FC<Props> = ({ handleIdChange }) => {
               sx={{ ml: 1, flex: 1 }}
               placeholder="Search flash card"
               inputProps={{ 'aria-label': 'Search flash card' }}
-              onChange={(e) => setSearchFilter(e.target.value)}
               // required
             />
             <IconButton type="submit" sx={{ p: '10px' }} aria-label="search">
@@ -292,8 +445,14 @@ const Dashboard: React.FC<Props> = ({ handleIdChange }) => {
           >
             <Typography>Enjoy using this flashcard application</Typography>
             <Box sx={{ display: 'flex', alignContent: 'right' }}>
-              <Link to="/signin" onClick={()=> {
-                localStorage.removeItem("auth-token")}}>Sign out</Link>
+              <Link
+                to="/"
+                onClick={() => {
+                  localStorage.removeItem('auth-token');
+                }}
+              >
+                Sign out
+              </Link>
             </Box>
           </Box>
 
@@ -307,35 +466,37 @@ const Dashboard: React.FC<Props> = ({ handleIdChange }) => {
               padding: '40px',
               borderRadius: '10px',
             }}
-            onSubmit={ handleSubmit }
+            onSubmit={handleSubmit}
           >
             <Input
              value= { formState.question } 
              placeholder= { formState.update? formState.oldQuestion : "Question" } 
-             inputProps={ariaLabel} 
-             onChange={(e) =>
-              setFormState({
-                ...formState,
-                question: e.target.value
-              })}
+              inputProps={ariaLabel}
+              onChange={(e) =>
+                setFormState({
+                  ...formState,
+                  question: e.target.value,
+                })
+              }
             />
             <Input
-              value =  { formState.answer }
-              placeholder={ formState.update? formState.oldAnswer : "Answer" }
+              value={formState.answer}
+              placeholder={formState.update ? formState.oldAnswer : 'Answer'}
               inputProps={ariaLabel}
               sx={{ marginTop: '40px' }}
               onChange={(e) =>
                 setFormState({
                   ...formState,
-                  answer: e.target.value
-                })}
+                  answer: e.target.value,
+                })
+              }
             />
             <Button
               variant="contained"
-              type='submit'
+              type="submit"
               sx={{ marginTop: '40px', backgroundColor: '#4169e1' }}
             >
-             {formState.update ? "Update card" : "Add flashcard "} 
+              {formState.update ? 'Update card' : 'Add flashcard '}
             </Button>
           </Box>
         </Container>
@@ -381,7 +542,7 @@ const CardContent = styled.div({
   height: '100%',
   transition: 'transform 4s',
   transformStyle: 'preserve-3d',
-  ':hover': { transform: 'rotateY(180deg)'} ,
+  ':hover': { transform: 'rotateY(180deg)' },
   position: 'relative',
 });
 
@@ -401,19 +562,19 @@ const CardBodyFront = styled.div({
   color: colors.textSecondary,
   flexDirection: 'column',
   justifyContent: 'space-around',
-  WebkitBackfaceVisibility : 'hidden',
-  backfaceVisibility:'hidden',
+  WebkitBackfaceVisibility: 'hidden',
+  backfaceVisibility: 'hidden',
 });
 
-const CardBodyBack= styled.div({
+const CardBodyBack = styled.div({
   padding: 18,
   flex: 1,
   display: 'flex',
   color: colors.textSecondary,
   flexDirection: 'column',
   justifyContent: 'space-around',
-  WebkitBackfaceVisibility : 'hidden',
-  backfaceVisibility:'hidden',
+  WebkitBackfaceVisibility: 'hidden',
+  backfaceVisibility: 'hidden',
   transform: 'rotateY(180deg)',
   // position: 'absolute',
 });
@@ -430,14 +591,10 @@ const AuthorName = styled.div({
 });
 
 const Icons = styled.div({
-    lineHeight: '1em',
-    fontSize: '1.1em',
-    display: 'flex',
-    justifyContent: 'right',
-  });
-
-
-
+  lineHeight: '1em',
+  fontSize: '1.1em',
+  display: 'flex',
+  justifyContent: 'right',
+});
 
 export default Dashboard;
-

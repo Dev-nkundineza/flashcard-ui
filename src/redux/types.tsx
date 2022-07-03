@@ -1,3 +1,4 @@
 export const actionTypes = {
     GET_OWN_FLASHCARDS:'GET_OWN_FLASHCARDS',
+    EXPLORE_FLASHCARDS: 'EXPLORE_FLASHCARDS'
   }

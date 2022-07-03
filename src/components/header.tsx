@@ -10,7 +10,6 @@ const Header: React.FC = () => {
     <HeaderBar>
       <Container>
         <HomeButtonContainer>
-          <HomeLink to="/">
             <HomeButton>
               <LogoContainer>
                 <Logo src={logo} />
@@ -20,7 +19,6 @@ const Header: React.FC = () => {
                 <div>Questions and Answers updated</div>
               </Title>
             </HomeButton>
-          </HomeLink>
         </HomeButtonContainer>
       </Container>
     </HeaderBar>
@@ -45,9 +43,9 @@ const Container = styled.div({
   width: `100px`,
 });
 
-const HomeLink = styled(Link)({
-  textDecoration: 'none',
-});
+// const HomeLink = styled(Link)({
+//   textDecoration: 'none',
+// });
 
 const HomeButtonContainer = styled.div({
   display: 'flex',
